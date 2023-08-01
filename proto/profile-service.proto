@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+option go_package = "github.com/artnikel/ProfileService/proto";
+
+message User {
+    string id = 1;
+    string login = 2;
+    string password = 3;
+    string refresh_token = 4;
+}
+
+message TokenPair {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+service UserService {
+    rpc SignUp(SignUpRequest) returns (SignUpResponse);
+    rpc Login(LoginRequest) returns (LoginResponse);
+    rpc Refresh(RefreshRequest) returns (RefreshResponse);
+    rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
+}
+
+message SignUpRequest{
+    User user = 1;
+}
+
+message SignUpResponse{
+    string id = 1;
+    string error = 2;
+}
+
+message LoginRequest{
+    User user = 1;
+}
+
+message LoginResponse{
+    TokenPair tokenpair = 1;
+    string error = 2;
+}
+
+message RefreshRequest{
+    TokenPair tokenpair = 1;
+}
+
+message RefreshResponse{
+    TokenPair tokenpair = 1;
+    string error = 2;
+}
+
+message DeleteAccountRequest{
+    string id = 1;
+}
+
+message DeleteAccountResponse{
+    string error = 1;
+}
