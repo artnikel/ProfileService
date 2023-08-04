@@ -24,7 +24,7 @@ var (
 	}
 )
 
-func SetupTestPgx() (*pgxpool.Pool, func(), error) {
+func SetupTestPostgres() (*pgxpool.Pool, func(), error) {
 	pool, err := dockertest.NewPool("")
 	if err != nil {
 		return nil, nil, fmt.Errorf("could not construct pool: %w", err)
@@ -66,15 +66,15 @@ func RunMigrations(port string) error {
 }
 
 func TestMain(m *testing.M) {
-	dbpool, cleanupPgx, err := SetupTestPgx()
+	dbpool, cleanupPostgres, err := SetupTestPostgres()
 	if err != nil {
 		fmt.Println("Could not construct the pool: ", err)
-		cleanupPgx()
+		cleanupPostgres()
 		os.Exit(1)
 	}
 	pg = NewPgRepository(dbpool)
 	exitVal := m.Run()
-	cleanupPgx()
+	cleanupPostgres()
 	os.Exit(exitVal)
 }
 
@@ -99,7 +99,7 @@ func TestAddRefreshToken(t *testing.T) {
 	testUser.Login = "testLogin3"
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
-	err = pg.AddRefreshToken(context.Background(),&testUser)
+	err = pg.AddRefreshToken(context.Background(),testUser.ID,testUser.RefreshToken)
 	require.NoError(t, err)
 }
 
@@ -117,7 +117,7 @@ func TestGetEmptyRefreshTokenByID(t *testing.T) {
 	testUser.Login = "testLogin6"
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
-	err = pg.AddRefreshToken(context.Background(),&testUser)
+	err = pg.AddRefreshToken(context.Background(),testUser.ID,testUser.RefreshToken)
 	require.NoError(t, err)
 	refreshToken, err := pg.GetRefreshTokenByID(context.Background(),testUser.ID)
 	require.NoError(t, err)
@@ -130,7 +130,7 @@ func TestGetRefreshTokenByID(t *testing.T) {
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
 	testUser.RefreshToken = "testRefreshToken"
-	err = pg.AddRefreshToken(context.Background(),&testUser)
+	err = pg.AddRefreshToken(context.Background(),testUser.ID,testUser.RefreshToken)
 	require.NoError(t, err)
 	refreshToken, err := pg.GetRefreshTokenByID(context.Background(),testUser.ID)
 	require.NoError(t, err)

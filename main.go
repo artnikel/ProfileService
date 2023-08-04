@@ -1,3 +1,4 @@
+// Package main of a project
 package main
 
 import (
@@ -17,11 +18,11 @@ import (
 )
 
 func connectPostgres(cfg *config.Variables) (*pgxpool.Pool, error) {
-	cfgPgx, err := pgxpool.ParseConfig(cfg.PostgresConnProfile)
+	cfgPostgres, err := pgxpool.ParseConfig(cfg.PostgresConnProfile)
 	if err != nil {
 		return nil, err
 	}
-	dbpool, err := pgxpool.NewWithConfig(context.Background(), cfgPgx)
+	dbpool, err := pgxpool.NewWithConfig(context.Background(), cfgPostgres)
 	if err != nil {
 		return nil, err
 	}
@@ -29,11 +30,13 @@ func connectPostgres(cfg *config.Variables) (*pgxpool.Pool, error) {
 }
 
 func main() {
-	var cfg config.Variables
+	var (
+		cfg config.Variables
+		v   = validator.New()
+	)
 	if err := env.Parse(&cfg); err != nil {
 		log.Fatal("could not parse config: ", err)
 	}
-	validate := validator.New()
 	dbpool, errPool := connectPostgres(&cfg)
 	if errPool != nil {
 		log.Fatal("could not construct the pool: ", errPool)
@@ -41,12 +44,11 @@ func main() {
 	defer dbpool.Close()
 	pgRep := repository.NewPgRepository(dbpool)
 	pgServ := service.NewUserService(pgRep, &cfg)
-	pgHandl := handler.NewEntityUser(pgServ, validate)
+	pgHandl := handler.NewEntityUser(pgServ, v)
 	lis, err := net.Listen("tcp", "localhost:8090")
 	if err != nil {
 		log.Fatalf("Cannot create listener: %s", err)
 	}
-	//interceptorOption := grpc.UnaryInterceptor(interceptor.JWTInterceptor)
 	grpcServer := grpc.NewServer()
 	proto.RegisterUserServiceServer(grpcServer, pgHandl)
 	err = grpcServer.Serve(lis)

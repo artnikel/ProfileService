@@ -19,8 +19,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	SignUp(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*SignUpResponse, error)
-	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-	Refresh(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*RefreshResponse, error)
+	GetByLogin(ctx context.Context, in *GetByLoginRequest, opts ...grpc.CallOption) (*GetByLoginResponse, error)
+	AddRefreshToken(ctx context.Context, in *AddRefreshTokenRequest, opts ...grpc.CallOption) (*AddRefreshTokenResponse, error)
+	GetRefreshTokenByID(ctx context.Context, in *GetRefreshTokenByIDRequest, opts ...grpc.CallOption) (*GetRefreshTokenByIDResponse, error)
 	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...grpc.CallOption) (*DeleteAccountResponse, error)
 }
 
@@ -41,18 +42,27 @@ func (c *userServiceClient) SignUp(ctx context.Context, in *SignUpRequest, opts 
 	return out, nil
 }
 
-func (c *userServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
-	out := new(LoginResponse)
-	err := c.cc.Invoke(ctx, "/UserService/Login", in, out, opts...)
+func (c *userServiceClient) GetByLogin(ctx context.Context, in *GetByLoginRequest, opts ...grpc.CallOption) (*GetByLoginResponse, error) {
+	out := new(GetByLoginResponse)
+	err := c.cc.Invoke(ctx, "/UserService/GetByLogin", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) Refresh(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*RefreshResponse, error) {
-	out := new(RefreshResponse)
-	err := c.cc.Invoke(ctx, "/UserService/Refresh", in, out, opts...)
+func (c *userServiceClient) AddRefreshToken(ctx context.Context, in *AddRefreshTokenRequest, opts ...grpc.CallOption) (*AddRefreshTokenResponse, error) {
+	out := new(AddRefreshTokenResponse)
+	err := c.cc.Invoke(ctx, "/UserService/AddRefreshToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetRefreshTokenByID(ctx context.Context, in *GetRefreshTokenByIDRequest, opts ...grpc.CallOption) (*GetRefreshTokenByIDResponse, error) {
+	out := new(GetRefreshTokenByIDResponse)
+	err := c.cc.Invoke(ctx, "/UserService/GetRefreshTokenByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +83,9 @@ func (c *userServiceClient) DeleteAccount(ctx context.Context, in *DeleteAccount
 // for forward compatibility
 type UserServiceServer interface {
 	SignUp(context.Context, *SignUpRequest) (*SignUpResponse, error)
-	Login(context.Context, *LoginRequest) (*LoginResponse, error)
-	Refresh(context.Context, *RefreshRequest) (*RefreshResponse, error)
+	GetByLogin(context.Context, *GetByLoginRequest) (*GetByLoginResponse, error)
+	AddRefreshToken(context.Context, *AddRefreshTokenRequest) (*AddRefreshTokenResponse, error)
+	GetRefreshTokenByID(context.Context, *GetRefreshTokenByIDRequest) (*GetRefreshTokenByIDResponse, error)
 	DeleteAccount(context.Context, *DeleteAccountRequest) (*DeleteAccountResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
@@ -86,11 +97,14 @@ type UnimplementedUserServiceServer struct {
 func (UnimplementedUserServiceServer) SignUp(context.Context, *SignUpRequest) (*SignUpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignUp not implemented")
 }
-func (UnimplementedUserServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+func (UnimplementedUserServiceServer) GetByLogin(context.Context, *GetByLoginRequest) (*GetByLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByLogin not implemented")
 }
-func (UnimplementedUserServiceServer) Refresh(context.Context, *RefreshRequest) (*RefreshResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Refresh not implemented")
+func (UnimplementedUserServiceServer) AddRefreshToken(context.Context, *AddRefreshTokenRequest) (*AddRefreshTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddRefreshToken not implemented")
+}
+func (UnimplementedUserServiceServer) GetRefreshTokenByID(context.Context, *GetRefreshTokenByIDRequest) (*GetRefreshTokenByIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRefreshTokenByID not implemented")
 }
 func (UnimplementedUserServiceServer) DeleteAccount(context.Context, *DeleteAccountRequest) (*DeleteAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccount not implemented")
@@ -126,38 +140,56 @@ func _UserService_SignUp_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LoginRequest)
+func _UserService_GetByLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByLoginRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).Login(ctx, in)
+		return srv.(UserServiceServer).GetByLogin(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/Login",
+		FullMethod: "/UserService/GetByLogin",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).Login(ctx, req.(*LoginRequest))
+		return srv.(UserServiceServer).GetByLogin(ctx, req.(*GetByLoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_Refresh_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RefreshRequest)
+func _UserService_AddRefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddRefreshTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).Refresh(ctx, in)
+		return srv.(UserServiceServer).AddRefreshToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/Refresh",
+		FullMethod: "/UserService/AddRefreshToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).Refresh(ctx, req.(*RefreshRequest))
+		return srv.(UserServiceServer).AddRefreshToken(ctx, req.(*AddRefreshTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetRefreshTokenByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRefreshTokenByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetRefreshTokenByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UserService/GetRefreshTokenByID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetRefreshTokenByID(ctx, req.(*GetRefreshTokenByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -192,12 +224,16 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_SignUp_Handler,
 		},
 		{
-			MethodName: "Login",
-			Handler:    _UserService_Login_Handler,
+			MethodName: "GetByLogin",
+			Handler:    _UserService_GetByLogin_Handler,
 		},
 		{
-			MethodName: "Refresh",
-			Handler:    _UserService_Refresh_Handler,
+			MethodName: "AddRefreshToken",
+			Handler:    _UserService_AddRefreshToken_Handler,
+		},
+		{
+			MethodName: "GetRefreshTokenByID",
+			Handler:    _UserService_GetRefreshTokenByID_Handler,
 		},
 		{
 			MethodName: "DeleteAccount",

@@ -1,3 +1,4 @@
+// Package model contains models of using entities
 package model
 
 import "github.com/google/uuid"

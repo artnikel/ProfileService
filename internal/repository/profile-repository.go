@@ -50,8 +50,8 @@ func (p *PgRepository) GetByLogin(ctx context.Context, login string) ([]byte, uu
 }
 
 // AddRefreshToken adds a token to the user's record in the database.
-func (p *PgRepository) AddRefreshToken(ctx context.Context, user *model.User) error {
-	_, err := p.pool.Exec(ctx, "UPDATE users SET refreshtoken = $1 WHERE id = $2", user.RefreshToken, user.ID)
+func (p *PgRepository) AddRefreshToken(ctx context.Context, id uuid.UUID, refreshToken string) error {
+	_, err := p.pool.Exec(ctx, "UPDATE users SET refreshtoken = $1 WHERE id = $2", refreshToken, id)
 	if err != nil {
 		return fmt.Errorf("PgRepository-AddRefreshToken : r.pool.Exec(): %w", err)
 	}
