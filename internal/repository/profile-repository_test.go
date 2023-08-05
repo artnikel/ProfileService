@@ -88,7 +88,7 @@ func TestGetByLoginUser(t *testing.T) {
 	testUser.Login = "testLogin2"
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
-	password, id, err := pg.GetByLogin(context.Background(),testUser.Login)
+	password, id, err := pg.GetByLogin(context.Background(), testUser.Login)
 	require.NoError(t, err)
 	require.Equal(t, password, testUser.Password)
 	require.NotEqual(t, id, uuid.Nil)
@@ -99,7 +99,7 @@ func TestAddRefreshToken(t *testing.T) {
 	testUser.Login = "testLogin3"
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
-	err = pg.AddRefreshToken(context.Background(),testUser.ID,testUser.RefreshToken)
+	err = pg.AddRefreshToken(context.Background(), testUser.ID, testUser.RefreshToken)
 	require.NoError(t, err)
 }
 
@@ -108,7 +108,7 @@ func TestDeleteAccount(t *testing.T) {
 	testUser.Login = "testLogin4"
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
-	err = pg.DeleteAccount(context.Background(),testUser.ID)
+	err = pg.DeleteAccount(context.Background(), testUser.ID)
 	require.NoError(t, err)
 }
 
@@ -117,9 +117,9 @@ func TestGetEmptyRefreshTokenByID(t *testing.T) {
 	testUser.Login = "testLogin6"
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
-	err = pg.AddRefreshToken(context.Background(),testUser.ID,testUser.RefreshToken)
+	err = pg.AddRefreshToken(context.Background(), testUser.ID, testUser.RefreshToken)
 	require.NoError(t, err)
-	refreshToken, err := pg.GetRefreshTokenByID(context.Background(),testUser.ID)
+	refreshToken, err := pg.GetRefreshTokenByID(context.Background(), testUser.ID)
 	require.NoError(t, err)
 	require.Empty(t, refreshToken)
 }
@@ -130,9 +130,9 @@ func TestGetRefreshTokenByID(t *testing.T) {
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
 	testUser.RefreshToken = "testRefreshToken"
-	err = pg.AddRefreshToken(context.Background(),testUser.ID,testUser.RefreshToken)
+	err = pg.AddRefreshToken(context.Background(), testUser.ID, testUser.RefreshToken)
 	require.NoError(t, err)
-	refreshToken, err := pg.GetRefreshTokenByID(context.Background(),testUser.ID)
+	refreshToken, err := pg.GetRefreshTokenByID(context.Background(), testUser.ID)
 	require.NoError(t, err)
-	require.Equal(t, refreshToken,testUser.RefreshToken,"testRefreshToken")
+	require.Equal(t, refreshToken, testUser.RefreshToken, "testRefreshToken")
 }

@@ -29,6 +29,7 @@ func connectPostgres(cfg *config.Variables) (*pgxpool.Pool, error) {
 	return dbpool, nil
 }
 
+// nolint gocritic
 func main() {
 	var (
 		cfg config.Variables

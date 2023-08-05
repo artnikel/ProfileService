@@ -23,7 +23,6 @@ message SignUpRequest{
 
 message SignUpResponse{
     string id = 1;
-    string error = 2;
 }
 
 message GetByLoginRequest{
@@ -33,7 +32,6 @@ message GetByLoginRequest{
 message GetByLoginResponse{
     string password = 1;
     string id = 2;
-    string error = 3;
 }
 
 message AddRefreshTokenRequest{
@@ -41,10 +39,7 @@ message AddRefreshTokenRequest{
     string refresh_token = 2;
 }
 
-message AddRefreshTokenResponse{
-    string id  = 1;
-    string error = 2;
-}
+message AddRefreshTokenResponse{}
 
 message GetRefreshTokenByIDRequest{
     string id = 1;
@@ -52,7 +47,6 @@ message GetRefreshTokenByIDRequest{
 
 message GetRefreshTokenByIDResponse{
     string refresh_token = 1;
-    string error = 2;
 }
 
 message DeleteAccountRequest{
@@ -61,5 +55,4 @@ message DeleteAccountRequest{
 
 message DeleteAccountResponse{
     string id = 1;
-    string error = 2;
 }

@@ -1,3 +1,4 @@
+// Package repository is a lower level of project
 package repository
 
 import (
@@ -70,7 +71,7 @@ func (p *PgRepository) GetRefreshTokenByID(ctx context.Context, id uuid.UUID) (s
 
 // DeleteAccount deleted account by id.
 func (p *PgRepository) DeleteAccount(ctx context.Context, id uuid.UUID) error {
-	_, err := p.pool.Exec(ctx,"DELETE FROM users WHERE id = $1", id )
+	_, err := p.pool.Exec(ctx, "DELETE FROM users WHERE id = $1", id)
 	if err != nil {
 		return fmt.Errorf("PgRepository-DeleteAccount: error in method r.pool.Exec(): %w", err)
 	}

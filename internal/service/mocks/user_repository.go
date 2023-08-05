@@ -16,13 +16,13 @@ type UserRepository struct {
 	mock.Mock
 }
 
-// AddRefreshToken provides a mock function with given fields: ctx, user
-func (_m *UserRepository) AddRefreshToken(ctx context.Context, user *model.User) error {
-	ret := _m.Called(ctx, user)
+// AddRefreshToken provides a mock function with given fields: ctx, id, refreshToken
+func (_m *UserRepository) AddRefreshToken(ctx context.Context, id uuid.UUID, refreshToken string) error {
+	ret := _m.Called(ctx, id, refreshToken)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.User) error); ok {
-		r0 = rf(ctx, user)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) error); ok {
+		r0 = rf(ctx, id, refreshToken)
 	} else {
 		r0 = ret.Error(0)
 	}
