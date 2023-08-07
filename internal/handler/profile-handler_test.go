@@ -1,101 +1,101 @@
 package handler
 
-// import (
-// 	"context"
-// 	"testing"
+import (
+	"context"
+	"testing"
 
-// 	"github.com/artnikel/ProfileService/internal/handler/mocks"
-// 	"github.com/artnikel/ProfileService/internal/model"
-// 	"github.com/artnikel/ProfileService/internal/service"
-// 	"github.com/artnikel/ProfileService/proto"
-// 	"github.com/go-playground/validator/v10"
-// 	"github.com/google/uuid"
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/mock"
-// )
+	"github.com/artnikel/ProfileService/internal/handler/mocks"
+	"github.com/artnikel/ProfileService/internal/model"
+	"github.com/artnikel/ProfileService/proto"
+	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+)
 
-// var (
-// 	testTokens = &service.TokenPair{
-// 		AccessToken:  "",
-// 		RefreshToken: "",
-// 	}
-// 	testUser = model.User{
-// 		ID:           uuid.New(),
-// 		Login:        "testLogin",
-// 		Password:     []byte("testPassword"),
-// 		RefreshToken: "",
-// 	}
-// 	v = validator.New()
-// )
+var (
+	testUser = model.User{
+		ID:           uuid.New(),
+		Login:        "testLogin",
+		Password:     []byte("testPassword"),
+		RefreshToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+		eyJleHAiOjE2OTE1MzE2NzAsImlkIjoiMjE5NDkxNjctNTRhOC00NjAwLTk1NzMtM2EwYzAyZTE4NzFjIn0.
+		RI9lxDrDlj0RS3FAtNSdwFGz14v9NX1tOxmLjSpZ2dU`,
+	}
+	v = validator.New()
+)
 
-// func TestSignUp(t *testing.T) {
-// 	srv := new(mocks.UserService)
-// 	hndl := NewEntityUser(srv, v)
-// 	protoUser := &proto.User{
-// 		Login:    testUser.Login,
-// 		Password: string(testUser.Password),
-// 	}
-// 	srv.On("SignUp", mock.Anything, mock.AnythingOfType("*model.User")).Return(nil).Once()
-// 	resp, err := hndl.SignUp(context.Background(), &proto.SignUpRequest{
-// 		User: protoUser,
-// 	})
-// 	if resp.Error != "" && resp.Id == uuid.Nil.String() {
-// 		t.Errorf("error %v:", resp.Error)
-// 	}
-// 	assert.NoError(t, err)
-// 	srv.AssertExpectations(t)
-// }
+func TestSignUp(t *testing.T) {
+	srv := new(mocks.UserService)
+	hndl := NewEntityUser(srv, v)
+	protoUser := &proto.User{
+		Login:    testUser.Login,
+		Password: string(testUser.Password),
+	}
+	srv.On("SignUp", mock.Anything, mock.AnythingOfType("*model.User")).Return(nil).Once()
+	_, err := hndl.SignUp(context.Background(), &proto.SignUpRequest{
+		User: protoUser,
+	})
+	require.NoError(t, err)
+	srv.AssertExpectations(t)
+}
 
-// func TestLogin(t *testing.T) {
-// 	srv := new(mocks.UserService)
-// 	hndl := NewEntityUser(srv, v)
-// 	protoUser := &proto.User{
-// 		Login:    testUser.Login,
-// 		Password: string(testUser.Password),
-// 	}
-// 	srv.On("Login", mock.Anything, mock.AnythingOfType("*model.User")).Return(testTokens, nil).Once()
-// 	resp, err := hndl.Login(context.Background(), &proto.LoginRequest{
-// 		User: protoUser,
-// 	})
-// 	if resp.Error != "" {
-// 		t.Errorf("error: %v", resp.Error)
-// 	}
-// 	assert.NoError(t, err)
-// 	srv.AssertExpectations(t)
-// }
+func TestGetByLogin(t *testing.T) {
+	srv := new(mocks.UserService)
+	hndl := NewEntityUser(srv, v)
+	protoLogin := proto.GetByLoginRequest{
+		Login: testUser.Login,
+	}
+	srv.On("GetByLogin", mock.Anything, mock.AnythingOfType("string")).Return(testUser.Password, testUser.ID, nil).Once()
+	resp, err := hndl.GetByLogin(context.Background(), &proto.GetByLoginRequest{
+		Login: protoLogin.Login,
+	})
+	require.NoError(t, err)
+	require.Equal(t, resp.Id, testUser.ID.String())
+	require.Equal(t, resp.Password, string(testUser.Password))
+	srv.AssertExpectations(t)
+}
 
-// func TestRefresh(t *testing.T){
-// 	srv := new(mocks.UserService)
-// 	hndl := NewEntityUser(srv, v)
-// 	protoTokens := proto.TokenPair{
-// 		AccessToken:  testTokens.AccessToken,
-// 		RefreshToken: testTokens.RefreshToken,
-// 	}
-// 	srv.On("Refresh", mock.Anything, mock.AnythingOfType("service.TokenPair")).Return(testTokens, nil).Once()
-// 	resp, err := hndl.Refresh(context.Background(), &proto.RefreshRequest{
-// 		Tokenpair: &protoTokens,
-// 	})
-// 	if resp.Error != "" {
-// 		t.Errorf("error: %v", resp.Error)
-// 	}
-// 	assert.NoError(t, err)
-// 	srv.AssertExpectations(t)
-// }
+func TestAddRefreshToken(t *testing.T) {
+	srv := new(mocks.UserService)
+	hndl := NewEntityUser(srv, v)
+	protoID := proto.AddRefreshTokenRequest{
+		Id: testUser.ID.String(),
+	}
+	srv.On("AddRefreshToken", mock.Anything, mock.AnythingOfType("uuid.UUID"), mock.AnythingOfType("string")).Return(nil).Once()
+	_, err := hndl.AddRefreshToken(context.Background(), &proto.AddRefreshTokenRequest{
+		Id: protoID.Id,
+	})
+	require.NoError(t, err)
+	srv.AssertExpectations(t)
+}
 
-// func TestDeleteAccount(t *testing.T){
-// 	srv := new(mocks.UserService)
-// 	hndl := NewEntityUser(srv, v)
-// 	protoID := proto.DeleteAccountRequest{
-// 		Id: testUser.ID.String(),
-// 	}
-// 	srv.On("DeleteAccount", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(nil)
+func TestGetRefreshTokenByID(t *testing.T){
+	srv := new(mocks.UserService)
+	hndl := NewEntityUser(srv, v)
+	protoID := proto.GetRefreshTokenByIDRequest{
+		Id: testUser.ID.String(),
+	}
+	srv.On("GetRefreshTokenByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(testUser.RefreshToken,nil).Once()
+	resp, err := hndl.GetRefreshTokenByID(context.Background(), &proto.GetRefreshTokenByIDRequest{
+		Id: protoID.Id,
+	})
+	require.Equal(t, resp.RefreshToken,testUser.RefreshToken)
+	require.NoError(t, err)
+	srv.AssertExpectations(t)
+}
 
-// 	resp, err := hndl.DeleteAccount(context.Background(), &proto.DeleteAccountRequest{
-// 		Id: protoID.Id,
-// 	})
-// 	if resp.Error != "" {
-// 		t.Errorf("error %v:", resp.Error)
-// 	}
-// 	assert.NoError(t, err)
-// 	srv.AssertExpectations(t)
-// }
+func TestDeleteAccount(t *testing.T){
+	srv := new(mocks.UserService)
+	hndl := NewEntityUser(srv, v)
+	protoID := proto.DeleteAccountRequest{
+		Id: testUser.ID.String(),
+	}
+	srv.On("DeleteAccount", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(nil)
+
+	_, err := hndl.DeleteAccount(context.Background(), &proto.DeleteAccountRequest{
+		Id: protoID.Id,
+	})
+	require.NoError(t, err)
+	srv.AssertExpectations(t)
+}

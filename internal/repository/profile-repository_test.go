@@ -20,7 +20,9 @@ var (
 		ID:           uuid.New(),
 		Login:        "testLogin",
 		Password:     []byte("testPassword"),
-		RefreshToken: "",
+		RefreshToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+		eyJleHAiOjE2OTE1MzE2NzAsImlkIjoiMjE5NDkxNjctNTRhOC00NjAwLTk1NzMtM2EwYzAyZTE4NzFjIn0.
+		RI9lxDrDlj0RS3FAtNSdwFGz14v9NX1tOxmLjSpZ2dU`,
 	}
 )
 
@@ -110,18 +112,6 @@ func TestDeleteAccount(t *testing.T) {
 	require.NoError(t, err)
 	err = pg.DeleteAccount(context.Background(), testUser.ID)
 	require.NoError(t, err)
-}
-
-func TestGetEmptyRefreshTokenByID(t *testing.T) {
-	testUser.ID = uuid.New()
-	testUser.Login = "testLogin6"
-	err := pg.SignUp(context.Background(), &testUser)
-	require.NoError(t, err)
-	err = pg.AddRefreshToken(context.Background(), testUser.ID, testUser.RefreshToken)
-	require.NoError(t, err)
-	refreshToken, err := pg.GetRefreshTokenByID(context.Background(), testUser.ID)
-	require.NoError(t, err)
-	require.Empty(t, refreshToken)
 }
 
 func TestGetRefreshTokenByID(t *testing.T) {

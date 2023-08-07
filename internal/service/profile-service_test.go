@@ -15,29 +15,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// import (
-// 	"context"
-// 	"crypto/sha256"
-// 	"log"
-// 	"os"
-// 	"testing"
-
-// 	"github.com/artnikel/ProfileService/internal/config"
-// 	"github.com/artnikel/ProfileService/internal/model"
-// 	"github.com/artnikel/ProfileService/internal/service/mocks"
-// 	"github.com/caarlos0/env"
-// 	"github.com/google/uuid"
-// 	"github.com/stretchr/testify/mock"
-// 	"github.com/stretchr/testify/require"
-// 	"golang.org/x/crypto/bcrypt"
-// )
-
 var (
 	testUser = model.User{
 		ID:           uuid.New(),
 		Login:        "testLogin",
 		Password:     []byte("testPassword"),
-		RefreshToken: "",
+		RefreshToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+		eyJleHAiOjE2OTE1MzE2NzAsImlkIjoiMjE5NDkxNjctNTRhOC00NjAwLTk1NzMtM2EwYzAyZTE4NzFjIn0.
+		RI9lxDrDlj0RS3FAtNSdwFGz14v9NX1tOxmLjSpZ2dU`,
 	}
 	cfg config.Variables
 )
