@@ -10,7 +10,7 @@ import (
 	"github.com/artnikel/ProfileService/internal/handler"
 	"github.com/artnikel/ProfileService/internal/repository"
 	"github.com/artnikel/ProfileService/internal/service"
-	"github.com/artnikel/ProfileService/proto"
+	"github.com/artnikel/ProfileService/uproto"
 	"github.com/caarlos0/env"
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"

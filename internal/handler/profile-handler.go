@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/artnikel/ProfileService/internal/model"
-	"github.com/artnikel/ProfileService/proto"
+	"github.com/artnikel/ProfileService/uproto"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"

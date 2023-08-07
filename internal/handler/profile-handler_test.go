@@ -6,7 +6,7 @@ import (
 
 	"github.com/artnikel/ProfileService/internal/handler/mocks"
 	"github.com/artnikel/ProfileService/internal/model"
-	"github.com/artnikel/ProfileService/proto"
+	"github.com/artnikel/ProfileService/uproto"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
