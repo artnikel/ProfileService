@@ -51,7 +51,7 @@ func main() {
 		log.Fatalf("Cannot create listener: %s", err)
 	}
 	grpcServer := grpc.NewServer()
-	proto.RegisterUserServiceServer(grpcServer, pgHandl)
+	uproto.RegisterUserServiceServer(grpcServer, pgHandl)
 	err = grpcServer.Serve(lis)
 	if err != nil {
 		log.Fatalf("Failed to serve listener: %s", err)
