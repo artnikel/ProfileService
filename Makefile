@@ -1,7 +1,7 @@
 create:
-	protoc --proto_path=uproto \
-	--go_out=uproto \
+	protoc --proto_path=proto \
+	--go_out=proto \
 	--go_opt=paths=source_relative \
-	--go-grpc_out=uproto \
+	--go-grpc_out=proto \
 	--go-grpc_opt=paths=source_relative \
-	uproto/*.proto
+	proto/*.proto

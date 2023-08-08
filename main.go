@@ -10,7 +10,7 @@ import (
 	"github.com/artnikel/ProfileService/internal/handler"
 	"github.com/artnikel/ProfileService/internal/repository"
 	"github.com/artnikel/ProfileService/internal/service"
-	"github.com/artnikel/ProfileService/uproto"
+	"github.com/artnikel/ProfileService/proto"
 	"github.com/caarlos0/env"
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -51,7 +51,7 @@ func main() {
 		log.Fatalf("Cannot create listener: %s", err)
 	}
 	grpcServer := grpc.NewServer()
-	uproto.RegisterUserServiceServer(grpcServer, pgHandl)
+	proto.RegisterUserServiceServer(grpcServer, pgHandl)
 	err = grpcServer.Serve(lis)
 	if err != nil {
 		log.Fatalf("Failed to serve listener: %s", err)

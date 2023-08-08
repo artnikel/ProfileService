@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/artnikel/ProfileService/uproto";
+option go_package = "github.com/artnikel/ProfileService/proto";
 
 message User {
     string id = 1;
