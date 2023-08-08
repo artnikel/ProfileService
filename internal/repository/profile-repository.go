@@ -52,7 +52,15 @@ func (p *PgRepository) GetByLogin(ctx context.Context, login string) ([]byte, uu
 
 // AddRefreshToken adds a token to the user's record in the database.
 func (p *PgRepository) AddRefreshToken(ctx context.Context, id uuid.UUID, refreshToken string) error {
-	_, err := p.pool.Exec(ctx, "UPDATE users SET refreshtoken = $1 WHERE id = $2", refreshToken, id)
+	var count int
+	err := p.pool.QueryRow(ctx, "SELECT COUNT(id) FROM users WHERE id = $1", id).Scan(&count)
+	if err != nil {
+		return fmt.Errorf("PgRepository-AddRefreshToken: error in method r.pool.QuerryRow(): %w", err)
+	}
+	if count == 0  {
+		return fmt.Errorf("PgRepository-DeleteAccount: cannot add refresh token to non-existent user")
+	}
+	_, err = p.pool.Exec(ctx, "UPDATE users SET refreshtoken = $1 WHERE id = $2", refreshToken, id)
 	if err != nil {
 		return fmt.Errorf("PgRepository-AddRefreshToken : r.pool.Exec(): %w", err)
 	}
@@ -71,7 +79,15 @@ func (p *PgRepository) GetRefreshTokenByID(ctx context.Context, id uuid.UUID) (s
 
 // DeleteAccount deleted account by id.
 func (p *PgRepository) DeleteAccount(ctx context.Context, id uuid.UUID) error {
-	_, err := p.pool.Exec(ctx, "DELETE FROM users WHERE id = $1", id)
+	var count int
+	err := p.pool.QueryRow(ctx, "SELECT COUNT(id) FROM users WHERE id = $1", id).Scan(&count)
+	if err != nil {
+		return fmt.Errorf("PgRepository-DeleteAccount: error in method r.pool.QuerryRow(): %w", err)
+	}
+	if count == 0  {
+		return fmt.Errorf("PgRepository-DeleteAccount: cannot delete non-existent user")
+	}
+	_, err = p.pool.Exec(ctx, "DELETE FROM users WHERE id = $1", id)
 	if err != nil {
 		return fmt.Errorf("PgRepository-DeleteAccount: error in method r.pool.Exec(): %w", err)
 	}

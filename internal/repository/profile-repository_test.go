@@ -83,40 +83,51 @@ func TestMain(m *testing.M) {
 func TestSignUpUser(t *testing.T) {
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
-}
-
-func TestGetByLoginUser(t *testing.T) {
-	testUser.ID = uuid.New()
-	testUser.Login = "testLogin2"
-	err := pg.SignUp(context.Background(), &testUser)
-	require.NoError(t, err)
 	password, id, err := pg.GetByLogin(context.Background(), testUser.Login)
 	require.NoError(t, err)
 	require.Equal(t, password, testUser.Password)
 	require.NotEqual(t, id, uuid.Nil)
 }
 
-func TestAddRefreshToken(t *testing.T) {
+func TestGetByWrongLoginUser(t *testing.T){
 	testUser.ID = uuid.New()
-	testUser.Login = "testLogin3"
+	testUser.Login = "testLogin2"
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
-	err = pg.AddRefreshToken(context.Background(), testUser.ID, testUser.RefreshToken)
-	require.NoError(t, err)
+	var wronglogin string
+	password, id, err := pg.GetByLogin(context.Background(), wronglogin)
+	require.Error(t, err)
+	require.Equal(t,password,[]byte(nil))
+	require.Equal(t,id, uuid.Nil)
 }
 
 func TestDeleteAccount(t *testing.T) {
 	testUser.ID = uuid.New()
-	testUser.Login = "testLogin4"
+	testUser.Login = "testLogin3"
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
 	err = pg.DeleteAccount(context.Background(), testUser.ID)
 	require.NoError(t, err)
+	password, id, err := pg.GetByLogin(context.Background(), testUser.Login)
+	require.Error(t, err)
+	require.Equal(t,password,[]byte(nil))
+	require.Equal(t,id, uuid.Nil)
 }
 
-func TestGetRefreshTokenByID(t *testing.T) {
+func TestDeleteWrongAccount(t *testing.T) {
+	err := pg.DeleteAccount(context.Background(), uuid.Nil)
+	require.Error(t, err)
+	err = pg.DeleteAccount(context.Background(),uuid.New())
+	require.Error(t, err)
+	fakeUUID,err := uuid.Parse("00000000-0000-0000-0000-41db8a3d9113")
+	require.NoError(t, err)
+	err = pg.DeleteAccount(context.Background(),fakeUUID)
+	require.Error(t, err)
+}
+
+func TestAddGetRefreshToken(t *testing.T) {
 	testUser.ID = uuid.New()
-	testUser.Login = "testLogin5"
+	testUser.Login = "testLogin4"
 	err := pg.SignUp(context.Background(), &testUser)
 	require.NoError(t, err)
 	testUser.RefreshToken = "testRefreshToken"
@@ -125,4 +136,15 @@ func TestGetRefreshTokenByID(t *testing.T) {
 	refreshToken, err := pg.GetRefreshTokenByID(context.Background(), testUser.ID)
 	require.NoError(t, err)
 	require.Equal(t, refreshToken, testUser.RefreshToken, "testRefreshToken")
+}
+
+func TestAddRefreshTokenByWrongID(t *testing.T) {
+	err := pg.AddRefreshToken(context.Background(), uuid.New(), testUser.RefreshToken)
+	require.Error(t, err)
+	err = pg.AddRefreshToken(context.Background(), uuid.Nil, testUser.RefreshToken)
+	require.Error(t, err)
+	fakeUUID,err := uuid.Parse("00000000-0000-0000-0000-41db8a3d9113")
+	require.NoError(t, err)
+	err = pg.AddRefreshToken(context.Background(), fakeUUID, testUser.RefreshToken)
+	require.Error(t, err)
 }
