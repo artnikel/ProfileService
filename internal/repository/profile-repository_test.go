@@ -89,7 +89,7 @@ func TestSignUpUser(t *testing.T) {
 	require.NotEqual(t, id, uuid.Nil)
 }
 
-func TestGetByWrongLoginUser(t *testing.T){
+func TestGetByWrongLoginUser(t *testing.T) {
 	testUser.ID = uuid.New()
 	testUser.Login = "testLogin2"
 	err := pg.SignUp(context.Background(), &testUser)
@@ -97,8 +97,8 @@ func TestGetByWrongLoginUser(t *testing.T){
 	var wronglogin string
 	password, id, err := pg.GetByLogin(context.Background(), wronglogin)
 	require.Error(t, err)
-	require.Equal(t,password,[]byte(nil))
-	require.Equal(t,id, uuid.Nil)
+	require.Equal(t, password, []byte(nil))
+	require.Equal(t, id, uuid.Nil)
 }
 
 func TestDeleteAccount(t *testing.T) {
@@ -110,18 +110,18 @@ func TestDeleteAccount(t *testing.T) {
 	require.NoError(t, err)
 	password, id, err := pg.GetByLogin(context.Background(), testUser.Login)
 	require.Error(t, err)
-	require.Equal(t,password,[]byte(nil))
-	require.Equal(t,id, uuid.Nil)
+	require.Equal(t, password, []byte(nil))
+	require.Equal(t, id, uuid.Nil)
 }
 
 func TestDeleteWrongAccount(t *testing.T) {
 	err := pg.DeleteAccount(context.Background(), uuid.Nil)
 	require.Error(t, err)
-	err = pg.DeleteAccount(context.Background(),uuid.New())
+	err = pg.DeleteAccount(context.Background(), uuid.New())
 	require.Error(t, err)
-	fakeUUID,err := uuid.Parse("00000000-0000-0000-0000-41db8a3d9113")
+	fakeUUID, err := uuid.Parse("00000000-0000-0000-0000-41db8a3d9113")
 	require.NoError(t, err)
-	err = pg.DeleteAccount(context.Background(),fakeUUID)
+	err = pg.DeleteAccount(context.Background(), fakeUUID)
 	require.Error(t, err)
 }
 
@@ -143,7 +143,7 @@ func TestAddRefreshTokenByWrongID(t *testing.T) {
 	require.Error(t, err)
 	err = pg.AddRefreshToken(context.Background(), uuid.Nil, testUser.RefreshToken)
 	require.Error(t, err)
-	fakeUUID,err := uuid.Parse("00000000-0000-0000-0000-41db8a3d9113")
+	fakeUUID, err := uuid.Parse("00000000-0000-0000-0000-41db8a3d9113")
 	require.NoError(t, err)
 	err = pg.AddRefreshToken(context.Background(), fakeUUID, testUser.RefreshToken)
 	require.Error(t, err)
