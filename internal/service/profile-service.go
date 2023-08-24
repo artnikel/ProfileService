@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/artnikel/ProfileService/internal/config"
 	"github.com/artnikel/ProfileService/internal/model"
 	"github.com/google/uuid"
 )
@@ -22,12 +21,11 @@ type UserRepository interface {
 // UserService contains UserRepository interface
 type UserService struct {
 	uRep UserRepository
-	cfg  *config.Variables
 }
 
 // NewUserService accepts UserRepository object and returnes an object of type *UserService
-func NewUserService(uRep UserRepository, cfg *config.Variables) *UserService {
-	return &UserService{uRep: uRep, cfg: cfg}
+func NewUserService(uRep UserRepository) *UserService {
+	return &UserService{uRep: uRep}
 }
 
 // SignUp is a method of UserService that calls  method of Repository

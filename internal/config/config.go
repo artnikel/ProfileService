@@ -1,8 +1,16 @@
 // Package config with environment variables
 package config
 
+import "github.com/caarlos0/env"
+
 // Variables is a struct with environment variables
 type Variables struct {
 	PostgresConnProfile string `env:"POSTGRES_CONN_PROFILE"`
-	TokenSignature      string `env:"TOKEN_SIGNATURE"`
+}
+
+// New returns parsed object of config
+func New() (*Variables, error) {
+	cfg := &Variables{}
+	err := env.Parse(cfg)
+	return cfg, err
 }

@@ -11,14 +11,13 @@ import (
 	"github.com/artnikel/ProfileService/internal/repository"
 	"github.com/artnikel/ProfileService/internal/service"
 	"github.com/artnikel/ProfileService/proto"
-	"github.com/caarlos0/env"
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 )
 
-func connectPostgres(cfg *config.Variables) (*pgxpool.Pool, error) {
-	cfgPostgres, err := pgxpool.ParseConfig(cfg.PostgresConnProfile)
+func connectPostgres(connString string) (*pgxpool.Pool, error) {
+	cfgPostgres, err := pgxpool.ParseConfig(connString)
 	if err != nil {
 		return nil, err
 	}
@@ -31,20 +30,18 @@ func connectPostgres(cfg *config.Variables) (*pgxpool.Pool, error) {
 
 // nolint gocritic
 func main() {
-	var (
-		cfg config.Variables
-		v   = validator.New()
-	)
-	if err := env.Parse(&cfg); err != nil {
-		log.Fatal("could not parse config: ", err)
+	v := validator.New()
+	cfg, err := config.New()
+	if err != nil {
+		log.Fatal("Could not parse config: ", err)
 	}
-	dbpool, errPool := connectPostgres(&cfg)
+	dbpool, errPool := connectPostgres(cfg.PostgresConnProfile)
 	if errPool != nil {
 		log.Fatal("could not construct the pool: ", errPool)
 	}
 	defer dbpool.Close()
 	pgRep := repository.NewPgRepository(dbpool)
-	pgServ := service.NewUserService(pgRep, &cfg)
+	pgServ := service.NewUserService(pgRep)
 	pgHandl := handler.NewEntityUser(pgServ, v)
 	lis, err := net.Listen("tcp", "localhost:8090")
 	if err != nil {
