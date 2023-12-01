@@ -32,7 +32,7 @@ func NewUserService(uRep UserRepository) *UserService {
 func (us *UserService) SignUp(ctx context.Context, user *model.User) error {
 	err := us.uRep.SignUp(ctx, user)
 	if err != nil {
-		return fmt.Errorf("UserService-SignUp: error: %w", err)
+		return fmt.Errorf("signUp %w", err)
 	}
 	return nil
 }
@@ -41,7 +41,7 @@ func (us *UserService) SignUp(ctx context.Context, user *model.User) error {
 func (us *UserService) GetByLogin(ctx context.Context, login string) ([]byte, uuid.UUID, error) {
 	hash, id, err := us.uRep.GetByLogin(ctx, login)
 	if err != nil {
-		return nil, uuid.Nil, fmt.Errorf("UserService-GetByLogin: error: %w", err)
+		return nil, uuid.Nil, fmt.Errorf("getByLogin %w", err)
 	}
 	return hash, id, nil
 }
@@ -50,7 +50,7 @@ func (us *UserService) GetByLogin(ctx context.Context, login string) ([]byte, uu
 func (us *UserService) GetRefreshTokenByID(ctx context.Context, id uuid.UUID) (string, error) {
 	refreshToken, err := us.uRep.GetRefreshTokenByID(ctx, id)
 	if err != nil {
-		return "", fmt.Errorf("UserService-GetRefreshTokenByID: error: %w", err)
+		return "", fmt.Errorf("getRefreshTokenByID %w", err)
 	}
 	return refreshToken, nil
 }
@@ -59,7 +59,7 @@ func (us *UserService) GetRefreshTokenByID(ctx context.Context, id uuid.UUID) (s
 func (us *UserService) AddRefreshToken(ctx context.Context, id uuid.UUID, refreshToken string) error {
 	err := us.uRep.AddRefreshToken(ctx, id, refreshToken)
 	if err != nil {
-		return fmt.Errorf("UserService-GetRefreshTokenByID: error: %w", err)
+		return fmt.Errorf("addRefreshToken %w", err)
 	}
 	return nil
 }
@@ -68,7 +68,7 @@ func (us *UserService) AddRefreshToken(ctx context.Context, id uuid.UUID, refres
 func (us *UserService) DeleteAccount(ctx context.Context, id uuid.UUID) error {
 	err := us.uRep.DeleteAccount(ctx, id)
 	if err != nil {
-		return fmt.Errorf("UserService-DeleteAccount: error%w", err)
+		return fmt.Errorf("deleteAccount %w", err)
 	}
 	return nil
 }

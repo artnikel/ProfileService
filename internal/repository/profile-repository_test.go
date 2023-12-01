@@ -59,7 +59,13 @@ func SetupTestPostgres() (*pgxpool.Pool, func(), error) {
 }
 
 func RunMigrations(port string) error {
-	cmd := exec.Command("flyway", "-url=jdbc:postgresql://localhost:"+port+"/profiledb", "-user=profileuser", "-password=profilepassword", "-locations=filesystem:../../migrations", "-connectRetries=10", "migrate")
+	cmd := exec.Command("flyway",
+		"-url=jdbc:postgresql://localhost:"+port+"/profiledb",
+		"-user=profileuser",
+		"-password=profilepassword",
+		"-locations=filesystem:../../migrations",
+		"-connectRetries=10",
+		"migrate")
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)

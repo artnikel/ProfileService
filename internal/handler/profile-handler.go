@@ -44,13 +44,13 @@ func (handl *EntityUser) SignUp(ctx context.Context, req *proto.SignUpRequest) (
 	err := handl.validate.StructCtx(ctx, createdUser)
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.SignUpResponse{}, fmt.Errorf("failed to validate")
+		return &proto.SignUpResponse{}, fmt.Errorf("structCtx %w", err)
 	}
 
 	err = handl.srvcUser.SignUp(ctx, createdUser)
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.SignUpResponse{}, fmt.Errorf("failed to signUp")
+		return &proto.SignUpResponse{}, fmt.Errorf("signUp %w", err)
 	}
 
 	return &proto.SignUpResponse{
@@ -63,13 +63,13 @@ func (handl *EntityUser) GetByLogin(ctx context.Context, req *proto.GetByLoginRe
 	err := handl.validate.VarCtx(ctx, req.Login, "required,min=5,max=20")
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.GetByLoginResponse{}, fmt.Errorf("failed to validate")
+		return &proto.GetByLoginResponse{}, fmt.Errorf("varCtx %w", err)
 	}
 
 	password, id, err := handl.srvcUser.GetByLogin(ctx, req.Login)
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.GetByLoginResponse{}, fmt.Errorf("failed to get password and id by login")
+		return &proto.GetByLoginResponse{}, fmt.Errorf("getByLogin %w", err)
 	}
 
 	return &proto.GetByLoginResponse{
@@ -83,17 +83,17 @@ func (handl *EntityUser) AddRefreshToken(ctx context.Context, req *proto.AddRefr
 	err := handl.validate.VarCtx(ctx, req.Id, "required,uuid")
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("failed to validate")
+		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("varCtx %w", err)
 	}
 	userID, err := uuid.Parse(req.Id)
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("failed to parse id")
+		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("parse %w", err)
 	}
 	err = handl.srvcUser.AddRefreshToken(ctx, userID, req.RefreshToken)
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("failed to add refresh token by there ID")
+		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("addRefreshToken %w", err)
 	}
 	return &proto.AddRefreshTokenResponse{}, nil
 }
@@ -104,17 +104,17 @@ func (handl *EntityUser) GetRefreshTokenByID(ctx context.Context, req *proto.Get
 	err := handl.validate.VarCtx(ctx, id, "required,uuid")
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("failed to validate")
+		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("varCtx %w", err)
 	}
 	idUUID, err := uuid.Parse(id)
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("failed to parse id")
+		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("parse %w", err)
 	}
 	refreshToken, err := handl.srvcUser.GetRefreshTokenByID(ctx, idUUID)
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("failed to get refresh token by there ID")
+		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("getRefreshTokenByID %w", err)
 	}
 	return &proto.GetRefreshTokenByIDResponse{
 		RefreshToken: refreshToken,
@@ -127,17 +127,17 @@ func (handl *EntityUser) DeleteAccount(ctx context.Context, req *proto.DeleteAcc
 	err := handl.validate.VarCtx(ctx, id, "required,uuid")
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.DeleteAccountResponse{}, fmt.Errorf("failed to validate")
+		return &proto.DeleteAccountResponse{}, fmt.Errorf("varCtx %w", err)
 	}
 	idUUID, err := uuid.Parse(id)
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.DeleteAccountResponse{}, fmt.Errorf("failed to parse id")
+		return &proto.DeleteAccountResponse{}, fmt.Errorf("parse %w", err)
 	}
 	err = handl.srvcUser.DeleteAccount(ctx, idUUID)
 	if err != nil {
 		logrus.Errorf("error: %v", err)
-		return &proto.DeleteAccountResponse{}, fmt.Errorf("failed to delete by there ID")
+		return &proto.DeleteAccountResponse{}, fmt.Errorf("deleteAccount %w", err)
 	}
 	return &proto.DeleteAccountResponse{
 		Id: "Account with ID " + req.Id + " successfully deleted.",
