@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
 	id uuid,
 	login VARCHAR,
 	password VARCHAR,
