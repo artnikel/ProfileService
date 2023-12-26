@@ -16,8 +16,6 @@ import (
 type UserService interface {
 	SignUp(ctx context.Context, user *model.User) error
 	GetByLogin(ctx context.Context, login string) ([]byte, uuid.UUID, error)
-	AddRefreshToken(ctx context.Context, id uuid.UUID, refreshToken string) error
-	GetRefreshTokenByID(ctx context.Context, id uuid.UUID) (string, error)
 	DeleteAccount(ctx context.Context, id uuid.UUID) error
 }
 
@@ -75,49 +73,6 @@ func (handl *EntityUser) GetByLogin(ctx context.Context, req *proto.GetByLoginRe
 	return &proto.GetByLoginResponse{
 		Password: string(password),
 		Id:       id.String(),
-	}, nil
-}
-
-// AddRefreshToken calls method of Service by handler
-func (handl *EntityUser) AddRefreshToken(ctx context.Context, req *proto.AddRefreshTokenRequest) (*proto.AddRefreshTokenResponse, error) {
-	err := handl.validate.VarCtx(ctx, req.Id, "required,uuid")
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("varCtx %w", err)
-	}
-	userID, err := uuid.Parse(req.Id)
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("parse %w", err)
-	}
-	err = handl.srvcUser.AddRefreshToken(ctx, userID, req.RefreshToken)
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("addRefreshToken %w", err)
-	}
-	return &proto.AddRefreshTokenResponse{}, nil
-}
-
-// GetRefreshTokenByID calls method of Service by handler
-func (handl *EntityUser) GetRefreshTokenByID(ctx context.Context, req *proto.GetRefreshTokenByIDRequest) (*proto.GetRefreshTokenByIDResponse, error) {
-	id := req.Id
-	err := handl.validate.VarCtx(ctx, id, "required,uuid")
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("varCtx %w", err)
-	}
-	idUUID, err := uuid.Parse(id)
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("parse %w", err)
-	}
-	refreshToken, err := handl.srvcUser.GetRefreshTokenByID(ctx, idUUID)
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("getRefreshTokenByID %w", err)
-	}
-	return &proto.GetRefreshTokenByIDResponse{
-		RefreshToken: refreshToken,
 	}, nil
 }
 

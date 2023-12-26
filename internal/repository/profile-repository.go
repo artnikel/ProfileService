@@ -50,33 +50,6 @@ func (p *PgRepository) GetByLogin(ctx context.Context, login string) ([]byte, uu
 	return password, id, nil
 }
 
-// AddRefreshToken adds a token to the user's record in the database.
-func (p *PgRepository) AddRefreshToken(ctx context.Context, id uuid.UUID, refreshToken string) error {
-	var count int
-	err := p.pool.QueryRow(ctx, "SELECT COUNT(id) FROM users WHERE id = $1", id).Scan(&count)
-	if err != nil {
-		return fmt.Errorf("queryRow %w", err)
-	}
-	if count == 0 {
-		return fmt.Errorf("PgRepository-DeleteAccount: cannot add refresh token to non-existent user")
-	}
-	_, err = p.pool.Exec(ctx, "UPDATE users SET refreshtoken = $1 WHERE id = $2", refreshToken, id)
-	if err != nil {
-		return fmt.Errorf("exec %w", err)
-	}
-	return nil
-}
-
-// GetRefreshTokenByID returns refresh token by id.
-func (p *PgRepository) GetRefreshTokenByID(ctx context.Context, id uuid.UUID) (string, error) {
-	var refreshToken string
-	err := p.pool.QueryRow(ctx, "SELECT refreshtoken FROM users WHERE id = $1", id).Scan(&refreshToken)
-	if err != nil {
-		return "", fmt.Errorf("queryRow %w", err)
-	}
-	return refreshToken, nil
-}
-
 // DeleteAccount deleted account by id.
 func (p *PgRepository) DeleteAccount(ctx context.Context, id uuid.UUID) error {
 	var count int

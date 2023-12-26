@@ -18,9 +18,6 @@ var (
 		ID:       uuid.New(),
 		Login:    "testLogin",
 		Password: []byte("testPassword"),
-		RefreshToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
-		eyJleHAiOjE2OTE1MzE2NzAsImlkIjoiMjE5NDkxNjctNTRhOC00NjAwLTk1NzMtM2EwYzAyZTE4NzFjIn0.
-		RI9lxDrDlj0RS3FAtNSdwFGz14v9NX1tOxmLjSpZ2dU`,
 	}
 	v = validator.New()
 )
@@ -53,35 +50,6 @@ func TestGetByLogin(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, resp.Id, testUser.ID.String())
 	require.Equal(t, resp.Password, string(testUser.Password))
-	srv.AssertExpectations(t)
-}
-
-func TestAddRefreshToken(t *testing.T) {
-	srv := new(mocks.UserService)
-	hndl := NewEntityUser(srv, v)
-	protoID := proto.AddRefreshTokenRequest{
-		Id: testUser.ID.String(),
-	}
-	srv.On("AddRefreshToken", mock.Anything, mock.AnythingOfType("uuid.UUID"), mock.AnythingOfType("string")).Return(nil).Once()
-	_, err := hndl.AddRefreshToken(context.Background(), &proto.AddRefreshTokenRequest{
-		Id: protoID.Id,
-	})
-	require.NoError(t, err)
-	srv.AssertExpectations(t)
-}
-
-func TestGetRefreshTokenByID(t *testing.T) {
-	srv := new(mocks.UserService)
-	hndl := NewEntityUser(srv, v)
-	protoID := proto.GetRefreshTokenByIDRequest{
-		Id: testUser.ID.String(),
-	}
-	srv.On("GetRefreshTokenByID", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(testUser.RefreshToken, nil).Once()
-	resp, err := hndl.GetRefreshTokenByID(context.Background(), &proto.GetRefreshTokenByIDRequest{
-		Id: protoID.Id,
-	})
-	require.Equal(t, resp.RefreshToken, testUser.RefreshToken)
-	require.NoError(t, err)
 	srv.AssertExpectations(t)
 }
 

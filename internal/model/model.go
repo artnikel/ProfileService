@@ -8,5 +8,4 @@ type User struct {
 	ID           uuid.UUID `json:"-"`
 	Login        string    `json:"login" validate:"required,min=5,max=20"`
 	Password     []byte    `json:"password" validate:"required,min=8"`
-	RefreshToken string    `json:"-" `
 }
