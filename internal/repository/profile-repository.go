@@ -5,10 +5,10 @@ import (
 	"context"
 	"fmt"
 
+	berrors "github.com/artnikel/ProfileService/internal/errors"
 	"github.com/artnikel/ProfileService/internal/model"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
-	berrors "github.com/artnikel/ProfileService/internal/errors"
 )
 
 // PgRepository represents the PostgreSQL repository implementation.
@@ -31,7 +31,7 @@ func (p *PgRepository) SignUp(ctx context.Context, user *model.User) error {
 		return fmt.Errorf("queryRow %w", err)
 	}
 	if count != 0 {
-		return berrors.New(berrors.LoginAlreadyExist, "Login is occupied by another user")
+		return berrors.New(berrors.LoginAlreadyExist)
 	}
 	_, err = p.pool.Exec(ctx, "INSERT INTO users (id, login, password) VALUES ($1, $2, $3)", user.ID, user.Login, user.Password)
 	if err != nil {
@@ -59,7 +59,7 @@ func (p *PgRepository) DeleteAccount(ctx context.Context, id uuid.UUID) error {
 		return fmt.Errorf("queryRow %w", err)
 	}
 	if count == 0 {
-		return berrors.New(berrors.UserDoesntExists, "User doesnt exist")
+		return berrors.New(berrors.UserDoesntExists)
 	}
 	_, err = p.pool.Exec(ctx, "DELETE FROM users WHERE id = $1", id)
 	if err != nil {
