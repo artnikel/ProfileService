@@ -127,5 +127,3 @@ func TestDeleteWrongAccount(t *testing.T) {
 	err = pg.DeleteAccount(context.Background(), fakeUUID)
 	require.Error(t, err)
 }
-
-

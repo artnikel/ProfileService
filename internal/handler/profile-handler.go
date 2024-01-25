@@ -50,7 +50,7 @@ func (handl *EntityUser) SignUp(ctx context.Context, req *proto.SignUpRequest) (
 	err = handl.srvcUser.SignUp(ctx, createdUser)
 	if err != nil {
 		var e *berrors.BusinessError
-		if errors.As(err, &e)  {
+		if errors.As(err, &e) {
 			return &proto.SignUpResponse{}, err
 		}
 		logrus.Errorf("error: %v", err)
@@ -98,7 +98,7 @@ func (handl *EntityUser) DeleteAccount(ctx context.Context, req *proto.DeleteAcc
 	err = handl.srvcUser.DeleteAccount(ctx, idUUID)
 	if err != nil {
 		var e *berrors.BusinessError
-		if errors.As(err, &e)  {
+		if errors.As(err, &e) {
 			return &proto.DeleteAccountResponse{}, err
 		}
 		logrus.Errorf("error: %v", err)
