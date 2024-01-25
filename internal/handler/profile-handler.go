@@ -64,7 +64,7 @@ func (handl *EntityUser) SignUp(ctx context.Context, req *proto.SignUpRequest) (
 
 // GetByLogin calls method of Service by handler
 func (handl *EntityUser) GetByLogin(ctx context.Context, req *proto.GetByLoginRequest) (*proto.GetByLoginResponse, error) {
-	err := handl.validate.VarCtx(ctx, req.Login, "required,min=5,max=20")
+	err := handl.validate.VarCtx(ctx, req.Login, "required,min=5")
 	if err != nil {
 		logrus.Errorf("error: %v", err)
 		return &proto.GetByLoginResponse{}, fmt.Errorf("varCtx %w", err)
