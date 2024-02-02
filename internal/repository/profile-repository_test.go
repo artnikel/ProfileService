@@ -20,9 +20,6 @@ var (
 		ID:       uuid.New(),
 		Login:    "testLogin",
 		Password: []byte("testPassword"),
-		RefreshToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
-		eyJleHAiOjE2OTE1MzE2NzAsImlkIjoiMjE5NDkxNjctNTRhOC00NjAwLTk1NzMtM2EwYzAyZTE4NzFjIn0.
-		RI9lxDrDlj0RS3FAtNSdwFGz14v9NX1tOxmLjSpZ2dU`,
 	}
 )
 
@@ -128,29 +125,5 @@ func TestDeleteWrongAccount(t *testing.T) {
 	fakeUUID, err := uuid.Parse("00000000-0000-0000-0000-41db8a3d9113")
 	require.NoError(t, err)
 	err = pg.DeleteAccount(context.Background(), fakeUUID)
-	require.Error(t, err)
-}
-
-func TestAddGetRefreshToken(t *testing.T) {
-	testUser.ID = uuid.New()
-	testUser.Login = "testLogin4"
-	err := pg.SignUp(context.Background(), &testUser)
-	require.NoError(t, err)
-	testUser.RefreshToken = "testRefreshToken"
-	err = pg.AddRefreshToken(context.Background(), testUser.ID, testUser.RefreshToken)
-	require.NoError(t, err)
-	refreshToken, err := pg.GetRefreshTokenByID(context.Background(), testUser.ID)
-	require.NoError(t, err)
-	require.Equal(t, refreshToken, testUser.RefreshToken, "testRefreshToken")
-}
-
-func TestAddRefreshTokenByWrongID(t *testing.T) {
-	err := pg.AddRefreshToken(context.Background(), uuid.New(), testUser.RefreshToken)
-	require.Error(t, err)
-	err = pg.AddRefreshToken(context.Background(), uuid.Nil, testUser.RefreshToken)
-	require.Error(t, err)
-	fakeUUID, err := uuid.Parse("00000000-0000-0000-0000-41db8a3d9113")
-	require.NoError(t, err)
-	err = pg.AddRefreshToken(context.Background(), fakeUUID, testUser.RefreshToken)
 	require.Error(t, err)
 }

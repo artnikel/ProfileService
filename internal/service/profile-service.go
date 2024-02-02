@@ -3,8 +3,10 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	berrors "github.com/artnikel/ProfileService/internal/errors"
 	"github.com/artnikel/ProfileService/internal/model"
 	"github.com/google/uuid"
 )
@@ -13,8 +15,6 @@ import (
 type UserRepository interface {
 	SignUp(ctx context.Context, user *model.User) error
 	GetByLogin(ctx context.Context, username string) ([]byte, uuid.UUID, error)
-	AddRefreshToken(ctx context.Context, id uuid.UUID, refreshToken string) error
-	GetRefreshTokenByID(ctx context.Context, id uuid.UUID) (string, error)
 	DeleteAccount(ctx context.Context, id uuid.UUID) error
 }
 
@@ -32,6 +32,10 @@ func NewUserService(uRep UserRepository) *UserService {
 func (us *UserService) SignUp(ctx context.Context, user *model.User) error {
 	err := us.uRep.SignUp(ctx, user)
 	if err != nil {
+		var e *berrors.BusinessError
+		if errors.As(err, &e) {
+			return err
+		}
 		return fmt.Errorf("signUp %w", err)
 	}
 	return nil
@@ -46,28 +50,14 @@ func (us *UserService) GetByLogin(ctx context.Context, login string) ([]byte, uu
 	return hash, id, nil
 }
 
-// GetRefreshTokenByID is a method of UserService that calls method of Repository
-func (us *UserService) GetRefreshTokenByID(ctx context.Context, id uuid.UUID) (string, error) {
-	refreshToken, err := us.uRep.GetRefreshTokenByID(ctx, id)
-	if err != nil {
-		return "", fmt.Errorf("getRefreshTokenByID %w", err)
-	}
-	return refreshToken, nil
-}
-
-// AddRefreshToken is a method of UserService that calls method of Repository
-func (us *UserService) AddRefreshToken(ctx context.Context, id uuid.UUID, refreshToken string) error {
-	err := us.uRep.AddRefreshToken(ctx, id, refreshToken)
-	if err != nil {
-		return fmt.Errorf("addRefreshToken %w", err)
-	}
-	return nil
-}
-
 // DeleteAccount is a method from UserService that deleted account by id
 func (us *UserService) DeleteAccount(ctx context.Context, id uuid.UUID) error {
 	err := us.uRep.DeleteAccount(ctx, id)
 	if err != nil {
+		var e *berrors.BusinessError
+		if errors.As(err, &e) {
+			return err
+		}
 		return fmt.Errorf("deleteAccount %w", err)
 	}
 	return nil

@@ -3,8 +3,10 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	berrors "github.com/artnikel/ProfileService/internal/errors"
 	"github.com/artnikel/ProfileService/internal/model"
 	"github.com/artnikel/ProfileService/proto"
 	"github.com/go-playground/validator/v10"
@@ -16,8 +18,6 @@ import (
 type UserService interface {
 	SignUp(ctx context.Context, user *model.User) error
 	GetByLogin(ctx context.Context, login string) ([]byte, uuid.UUID, error)
-	AddRefreshToken(ctx context.Context, id uuid.UUID, refreshToken string) error
-	GetRefreshTokenByID(ctx context.Context, id uuid.UUID) (string, error)
 	DeleteAccount(ctx context.Context, id uuid.UUID) error
 }
 
@@ -49,6 +49,10 @@ func (handl *EntityUser) SignUp(ctx context.Context, req *proto.SignUpRequest) (
 
 	err = handl.srvcUser.SignUp(ctx, createdUser)
 	if err != nil {
+		var e *berrors.BusinessError
+		if errors.As(err, &e) {
+			return &proto.SignUpResponse{}, err
+		}
 		logrus.Errorf("error: %v", err)
 		return &proto.SignUpResponse{}, fmt.Errorf("signUp %w", err)
 	}
@@ -60,7 +64,7 @@ func (handl *EntityUser) SignUp(ctx context.Context, req *proto.SignUpRequest) (
 
 // GetByLogin calls method of Service by handler
 func (handl *EntityUser) GetByLogin(ctx context.Context, req *proto.GetByLoginRequest) (*proto.GetByLoginResponse, error) {
-	err := handl.validate.VarCtx(ctx, req.Login, "required,min=5,max=20")
+	err := handl.validate.VarCtx(ctx, req.Login, "required,min=5")
 	if err != nil {
 		logrus.Errorf("error: %v", err)
 		return &proto.GetByLoginResponse{}, fmt.Errorf("varCtx %w", err)
@@ -75,49 +79,6 @@ func (handl *EntityUser) GetByLogin(ctx context.Context, req *proto.GetByLoginRe
 	return &proto.GetByLoginResponse{
 		Password: string(password),
 		Id:       id.String(),
-	}, nil
-}
-
-// AddRefreshToken calls method of Service by handler
-func (handl *EntityUser) AddRefreshToken(ctx context.Context, req *proto.AddRefreshTokenRequest) (*proto.AddRefreshTokenResponse, error) {
-	err := handl.validate.VarCtx(ctx, req.Id, "required,uuid")
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("varCtx %w", err)
-	}
-	userID, err := uuid.Parse(req.Id)
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("parse %w", err)
-	}
-	err = handl.srvcUser.AddRefreshToken(ctx, userID, req.RefreshToken)
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.AddRefreshTokenResponse{}, fmt.Errorf("addRefreshToken %w", err)
-	}
-	return &proto.AddRefreshTokenResponse{}, nil
-}
-
-// GetRefreshTokenByID calls method of Service by handler
-func (handl *EntityUser) GetRefreshTokenByID(ctx context.Context, req *proto.GetRefreshTokenByIDRequest) (*proto.GetRefreshTokenByIDResponse, error) {
-	id := req.Id
-	err := handl.validate.VarCtx(ctx, id, "required,uuid")
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("varCtx %w", err)
-	}
-	idUUID, err := uuid.Parse(id)
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("parse %w", err)
-	}
-	refreshToken, err := handl.srvcUser.GetRefreshTokenByID(ctx, idUUID)
-	if err != nil {
-		logrus.Errorf("error: %v", err)
-		return &proto.GetRefreshTokenByIDResponse{}, fmt.Errorf("getRefreshTokenByID %w", err)
-	}
-	return &proto.GetRefreshTokenByIDResponse{
-		RefreshToken: refreshToken,
 	}, nil
 }
 
@@ -136,6 +97,10 @@ func (handl *EntityUser) DeleteAccount(ctx context.Context, req *proto.DeleteAcc
 	}
 	err = handl.srvcUser.DeleteAccount(ctx, idUUID)
 	if err != nil {
+		var e *berrors.BusinessError
+		if errors.As(err, &e) {
+			return &proto.DeleteAccountResponse{}, err
+		}
 		logrus.Errorf("error: %v", err)
 		return &proto.DeleteAccountResponse{}, fmt.Errorf("deleteAccount %w", err)
 	}
