@@ -44,7 +44,7 @@ func main() {
 	pgRep := repository.NewPgRepository(dbpool)
 	pgServ := service.NewUserService(pgRep)
 	pgHandl := handler.NewEntityUser(pgServ, v)
-	lis, err := net.Listen("tcp", "localhost:8090")
+	lis, err := net.Listen("tcp", cfg.ProfileAddress)
 	if err != nil {
 		log.Fatalf("cannot create listener: %s", err)
 	}

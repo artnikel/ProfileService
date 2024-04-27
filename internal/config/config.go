@@ -6,6 +6,7 @@ import "github.com/caarlos0/env"
 // Variables is a struct with environment variables
 type Variables struct {
 	PostgresConnProfile string `env:"POSTGRES_CONN_PROFILE"`
+	ProfileAddress      string `env:"PROFILE_ADDRESS"`
 }
 
 // New returns parsed object of config
